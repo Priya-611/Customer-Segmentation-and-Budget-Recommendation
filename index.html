@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Expense Management &amp; Budget Recommendation System</title>
+    <style>
+        :root {
+            --bg: #f5f7fb;
+            --card: #ffffff;
+            --text: #1f2937;
+            --muted: #6b7280;
+            --border: #e5e7eb;
+            --primary: #4f46e5;
+            --primary-hover: #4338ca;
+            --primary-soft: #eef2ff;
+            --error: #b91c1c;
+            --error-bg: #fef2f2;
+            --error-border: #fecaca;
+            --success: #065f46;
+            --success-bg: #ecfdf5;
+            --success-border: #a7f3d0;
+            --shadow: 0 18px 38px rgba(15, 23, 42, 0.08);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: Inter, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
+            background: radial-gradient(circle at top, #edf2ff 0%, var(--bg) 40%);
+            color: var(--text);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+        }
+
+        .card {
+            width: min(900px, 100%);
+            background: var(--card);
+            border-radius: 18px;
+            padding: 28px;
+            box-shadow: var(--shadow);
+            border: 1px solid #edf0f8;
+        }
+
+        .title {
+            margin-bottom: 6px;
+            font-size: clamp(1.35rem, 2.2vw, 1.9rem);
+            line-height: 1.25;
+        }
+
+        .subtitle {
+            color: var(--muted);
+            margin-bottom: 22px;
+            font-size: 0.96rem;
+        }
+
+        .form-grid {
+            display: grid;
+            gap: 16px;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+
+        .field {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .field.full {
+            grid-column: 1 / -1;
+        }
+
+        label {
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        input {
+            width: 100%;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 12px;
+            font-size: 0.98rem;
+            outline: none;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.15s ease;
+            background-color: #fff;
+        }
+
+        input::placeholder {
+            color: #9ca3af;
+        }
+
+        input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.14);
+            transform: translateY(-1px);
+        }
+
+        .action-row {
+            margin-top: 20px;
+            display: flex;
+            justify-content: flex-end;
+        }
+
+        button {
+            border: none;
+            border-radius: 10px;
+            background: var(--primary);
+            color: #fff;
+            font-size: 0.98rem;
+            font-weight: 700;
+            padding: 12px 18px;
+            min-width: 210px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            cursor: pointer;
+            transition: background-color 0.2s ease, transform 0.14s ease, box-shadow 0.2s ease;
+            box-shadow: 0 8px 18px rgba(79, 70, 229, 0.2);
+        }
+
+        button:hover {
+            background: var(--primary-hover);
+            transform: translateY(-1px);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        button:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .loader {
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(255, 255, 255, 0.4);
+            border-top-color: #fff;
+            border-radius: 50%;
+            animation: spin 0.85s linear infinite;
+            display: none;
+        }
+
+        .result {
+            margin-top: 22px;
+            border-radius: 12px;
+            padding: 14px 16px;
+            border: 1px solid transparent;
+            display: none;
+            animation: fadeIn 0.28s ease;
+        }
+
+        .result.success {
+            background: var(--success-bg);
+            border-color: var(--success-border);
+        }
+
+        .result.error {
+            background: var(--error-bg);
+            border-color: var(--error-border);
+            color: var(--error);
+        }
+
+        .result h3 {
+            margin-bottom: 8px;
+            font-size: 1rem;
+        }
+
+        .savings {
+            margin-top: 8px;
+            padding: 10px;
+            border-radius: 8px;
+            background: var(--primary-soft);
+            font-weight: 700;
+        }
+
+        ul {
+            margin-top: 8px;
+            padding-left: 18px;
+        }
+
+        li {
+            margin-bottom: 6px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(4px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @media (max-width: 700px) {
+            .card {
+                padding: 20px;
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .field.full {
+                grid-column: auto;
+            }
+
+            .action-row {
+                justify-content: stretch;
+            }
+
+            button {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <main class="card">
+        <h1 class="title">Smart Expense Management &amp; Budget Recommendation System</h1>
+        <p class="subtitle">Enter your monthly spending profile to get ML-driven budget recommendations and savings insights.</p>
+
+        <form id="budgetForm" novalidate>
+            <div class="form-grid">
+                <div class="field">
+                    <label for="groceries">Groceries</label>
+                    <input id="groceries" type="number" min="0" step="0.01" placeholder="e.g. 250.00" required>
+                </div>
+
+                <div class="field">
+                    <label for="transport">Transport</label>
+                    <input id="transport" type="number" min="0" step="0.01" placeholder="e.g. 120.00" required>
+                </div>
+
+                <div class="field">
+                    <label for="eatingOut">Eating Out</label>
+                    <input id="eatingOut" type="number" min="0" step="0.01" placeholder="e.g. 90.00" required>
+                </div>
+
+                <div class="field">
+                    <label for="entertainment">Entertainment</label>
+                    <input id="entertainment" type="number" min="0" step="0.01" placeholder="e.g. 80.00" required>
+                </div>
+
+                <div class="field">
+                    <label for="miscellaneous">Miscellaneous</label>
+                    <input id="miscellaneous" type="number" min="0" step="0.01" placeholder="e.g. 60.00" required>
+                </div>
+
+                <div class="field">
+                    <label for="desiredSavings">Desired Savings</label>
+                    <input id="desiredSavings" type="number" min="0" step="0.01" placeholder="e.g. 300.00" required>
+                </div>
+
+                <div class="field full">
+                    <label for="disposableIncome">Disposable Income</label>
+                    <input id="disposableIncome" type="number" min="0" step="0.01" placeholder="e.g. 1800.00" required>
+                </div>
+            </div>
+
+            <div class="action-row">
+                <button id="submitBtn" type="submit">
+                    <span id="btnText">Get Recommendation</span>
+                    <span id="loader" class="loader" aria-hidden="true"></span>
+                </button>
+            </div>
+        </form>
+
+        <section id="result" class="result" aria-live="polite"></section>
+    </main>
+
+    <script>
+        const form = document.getElementById("budgetForm");
+        const submitBtn = document.getElementById("submitBtn");
+        const btnText = document.getElementById("btnText");
+        const loader = document.getElementById("loader");
+        const result = document.getElementById("result");
+
+        function getNumber(id) {
+            return Number.parseFloat(document.getElementById(id).value);
+        }
+
+        function setLoading(isLoading) {
+            submitBtn.disabled = isLoading;
+            btnText.textContent = isLoading ? "Processing..." : "Get Recommendation";
+            loader.style.display = isLoading ? "inline-block" : "none";
+        }
+
+        function showError(message) {
+            result.className = "result error";
+            result.innerHTML = "<h3>Error</h3><p>" + message + "</p>";
+            result.style.display = "block";
+        }
+
+        function showSuccess(data) {
+            const message = data.message || data.Message || "Budget recommendation generated successfully.";
+            const savings = data.savings ?? data.Savings;
+            const suggestions = data.suggestions || data.Suggestions || [];
+
+            let html = "<h3>Message</h3><p>" + message + "</p>";
+
+            if (savings !== undefined && savings !== null && !Number.isNaN(Number(savings))) {
+                html += '<div class="savings">Savings: ' + Number(savings).toFixed(2) + "</div>";
+            }
+
+            if (Array.isArray(suggestions) && suggestions.length > 0) {
+                html += "<h3>Suggestions</h3><ul>";
+                for (const suggestion of suggestions) {
+                    html += "<li>" + suggestion + "</li>";
+                }
+                html += "</ul>";
+            }
+
+            result.className = "result success";
+            result.innerHTML = html;
+            result.style.display = "block";
+        }
+
+        form.addEventListener("submit", async (event) => {
+            event.preventDefault();
+            result.style.display = "none";
+
+            const payload = {
+                "Groceries": getNumber("groceries"),
+                "Transport": getNumber("transport"),
+                "Eating Out": getNumber("eatingOut"),
+                "Entertainment": getNumber("entertainment"),
+                "Miscellaneous": getNumber("miscellaneous"),
+                "Desired Savings": getNumber("desiredSavings"),
+                "Disposable Income": getNumber("disposableIncome")
+            };
+
+            const values = Object.values(payload);
+            const hasInvalid = values.some((value) => Number.isNaN(value) || value < 0);
+            if (hasInvalid) {
+                showError("Please enter valid non-negative numbers for all fields.");
+                return;
+            }
+
+            setLoading(true);
+            try {
+                const response = await fetch("http://127.0.0.1:8000/recommend-budget", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify(payload)
+                });
+
+                const data = await response.json().catch(() => ({}));
+                if (!response.ok) {
+                    throw new Error(data.message || data.error || "API request failed.");
+                }
+
+                showSuccess(data);
+            } catch (error) {
+                const fallback = "Could not connect to the API. Make sure Flask is running at http://127.0.0.1:8000 and CORS is enabled.";
+                showError(error.message === "Failed to fetch" ? fallback : error.message);
+            } finally {
+                setLoading(false);
+            }
+        });
+    </script>
+</body>
+</html>
