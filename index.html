@@ -1,291 +1,468 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Smart Expense Management &amp; Budget Recommendation System</title>
+    <title>Smart Expense Management & Budget Recommendation System</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
     <style>
         :root {
-            --bg: #f5f7fb;
-            --card: #ffffff;
-            --text: #1f2937;
-            --muted: #6b7280;
-            --border: #e5e7eb;
-            --primary: #4f46e5;
-            --primary-hover: #4338ca;
-            --primary-soft: #eef2ff;
-            --error: #b91c1c;
-            --error-bg: #fef2f2;
-            --error-border: #fecaca;
-            --success: #065f46;
-            --success-bg: #ecfdf5;
-            --success-border: #a7f3d0;
-            --shadow: 0 18px 38px rgba(15, 23, 42, 0.08);
+            --primary: #6366f1;
+            --primary-light: #818cf8;
+            --secondary: #ec4899;
+            --bg-color: #f8fafc;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --input-bg: rgba(255, 255, 255, 0.7);
+            --border-color: rgba(255, 255, 255, 0.5);
+            --glass-bg: rgba(255, 255, 255, 0.65);
+            --success: #10b981;
+            --error: #ef4444;
         }
 
         * {
-            box-sizing: border-box;
             margin: 0;
             padding: 0;
-            font-family: Inter, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            box-sizing: border-box;
+            font-family: 'Outfit', sans-serif;
         }
 
         body {
             min-height: 100vh;
-            background: radial-gradient(circle at top, #edf2ff 0%, var(--bg) 40%);
-            color: var(--text);
+            background: linear-gradient(135deg, #e0c3fc 0%, #8ec5fc 100%);
+            background-size: 200% 200%;
+            animation: gradientBG 15s ease infinite;
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 24px;
+            padding: 20px;
+            color: var(--text-main);
         }
 
-        .card {
-            width: min(900px, 100%);
-            background: var(--card);
-            border-radius: 18px;
-            padding: 28px;
-            box-shadow: var(--shadow);
-            border: 1px solid #edf0f8;
+        @keyframes gradientBG {
+            0% {
+                background-position: 0% 50%;
+            }
+
+            50% {
+                background-position: 100% 50%;
+            }
+
+            100% {
+                background-position: 0% 50%;
+            }
         }
 
-        .title {
-            margin-bottom: 6px;
-            font-size: clamp(1.35rem, 2.2vw, 1.9rem);
-            line-height: 1.25;
+        .glass-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--border-color);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            border-radius: 24px;
+            width: 100%;
+            max-width: 850px;
+            padding: 40px;
+            position: relative;
+            overflow: hidden;
         }
 
-        .subtitle {
-            color: var(--muted);
-            margin-bottom: 22px;
-            font-size: 0.96rem;
+        /* Decorative shapes */
+        .glass-card::before {
+            content: '';
+            position: absolute;
+            top: -50px;
+            right: -50px;
+            width: 150px;
+            height: 150px;
+            background: rgba(255, 255, 255, 0.4);
+            border-radius: 50%;
+            filter: blur(20px);
+            z-index: -1;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 35px;
+        }
+
+        .header h1 {
+            font-size: 2.2rem;
+            font-weight: 700;
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            color: var(--text-muted);
+            font-size: 1.05rem;
+        }
+
+        .sections-wrapper {
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+        }
+
+        .section-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--text-main);
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .section-title i {
+            color: var(--primary);
         }
 
         .form-grid {
             display: grid;
-            gap: 16px;
-            grid-template-columns: repeat(2, minmax(0, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 20px;
         }
 
-        .field {
+        .input-group {
+            position: relative;
             display: flex;
             flex-direction: column;
-            gap: 8px;
         }
 
-        .field.full {
-            grid-column: 1 / -1;
-        }
-
-        label {
+        .input-group label {
             font-size: 0.9rem;
-            font-weight: 600;
+            font-weight: 500;
+            margin-bottom: 8px;
+            color: var(--text-main);
         }
 
-        input {
+        .input-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .input-wrapper i {
+            position: absolute;
+            left: 14px;
+            color: var(--text-muted);
+            font-size: 1.1rem;
+            transition: color 0.3s ease;
+        }
+
+        .input-wrapper input {
             width: 100%;
-            border: 1px solid var(--border);
-            border-radius: 10px;
-            padding: 12px;
-            font-size: 0.98rem;
+            padding: 14px 14px 14px 45px;
+            border-radius: 12px;
+            border: 2px solid transparent;
+            background: var(--input-bg);
+            font-size: 1rem;
+            color: var(--text-main);
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.02);
+            transition: all 0.3s ease;
             outline: none;
-            transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.15s ease;
-            background-color: #fff;
         }
 
-        input::placeholder {
-            color: #9ca3af;
+        .input-wrapper input:focus {
+            border-color: var(--primary-light);
+            background: #ffffff;
+            box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
         }
 
-        input:focus {
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.14);
-            transform: translateY(-1px);
+        .input-wrapper input:focus+i,
+        .input-wrapper input:not(:placeholder-shown)+i {
+            color: var(--primary);
         }
 
         .action-row {
-            margin-top: 20px;
-            display: flex;
-            justify-content: flex-end;
+            margin-top: 25px;
+            text-align: center;
         }
 
-        button {
-            border: none;
-            border-radius: 10px;
-            background: var(--primary);
+        .submit-btn {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
             color: #fff;
-            font-size: 0.98rem;
-            font-weight: 700;
-            padding: 12px 18px;
-            min-width: 210px;
+            border: none;
+            padding: 16px 36px;
+            border-radius: 50px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 10px 20px rgba(99, 102, 241, 0.3);
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            gap: 10px;
-            cursor: pointer;
-            transition: background-color 0.2s ease, transform 0.14s ease, box-shadow 0.2s ease;
-            box-shadow: 0 8px 18px rgba(79, 70, 229, 0.2);
+            gap: 12px;
+            min-width: 250px;
         }
 
-        button:hover {
-            background: var(--primary-hover);
-            transform: translateY(-1px);
+        .submit-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 25px rgba(99, 102, 241, 0.4);
         }
 
-        button:active {
-            transform: translateY(0);
+        .submit-btn:active {
+            transform: translateY(1px);
         }
 
-        button:disabled {
+        .submit-btn:disabled {
             opacity: 0.7;
             cursor: not-allowed;
             transform: none;
         }
 
         .loader {
-            width: 16px;
-            height: 16px;
-            border: 2px solid rgba(255, 255, 255, 0.4);
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
             border-top-color: #fff;
             border-radius: 50%;
-            animation: spin 0.85s linear infinite;
+            animation: spin 1s linear infinite;
             display: none;
         }
 
-        .result {
-            margin-top: 22px;
-            border-radius: 12px;
-            padding: 14px 16px;
-            border: 1px solid transparent;
+        .result-container {
+            margin-top: 30px;
             display: none;
-            animation: fadeIn 0.28s ease;
+            animation: slideUp 0.5s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
-        .result.success {
-            background: var(--success-bg);
-            border-color: var(--success-border);
+        .result-card {
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 16px;
+            padding: 24px;
+            border-left: 6px solid var(--primary);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.05);
         }
 
-        .result.error {
-            background: var(--error-bg);
-            border-color: var(--error-border);
+        .result-card.success {
+            border-left-color: var(--success);
+        }
+
+        .result-card.error {
+            border-left-color: var(--error);
+        }
+
+        .result-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 15px;
+        }
+
+        .result-header i {
+            font-size: 1.5rem;
+        }
+
+        .result-card.success .result-header i {
+            color: var(--success);
+        }
+
+        .result-card.error .result-header i {
             color: var(--error);
         }
 
-        .result h3 {
-            margin-bottom: 8px;
-            font-size: 1rem;
+        .result-header h3 {
+            font-size: 1.25rem;
+            color: var(--text-main);
         }
 
-        .savings {
-            margin-top: 8px;
-            padding: 10px;
-            border-radius: 8px;
-            background: var(--primary-soft);
-            font-weight: 700;
+        .result-message {
+            font-size: 1.05rem;
+            line-height: 1.5;
+            color: var(--text-muted);
+            margin-bottom: 15px;
         }
 
-        ul {
-            margin-top: 8px;
-            padding-left: 18px;
+        .savings-badge {
+            display: inline-block;
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--success);
+            padding: 8px 16px;
+            border-radius: 50px;
+            font-weight: 600;
+            margin-bottom: 15px;
         }
 
-        li {
-            margin-bottom: 6px;
+        .suggestions-list {
+            list-style: none;
+            margin-top: 15px;
+        }
+
+        .suggestions-list li {
+            position: relative;
+            padding-left: 28px;
+            margin-bottom: 10px;
+            color: var(--text-main);
+            font-weight: 500;
+        }
+
+        .suggestions-list li::before {
+            content: '\f138';
+            font-family: 'FontAwesome';
+            position: absolute;
+            left: 0;
+            color: var(--secondary);
         }
 
         @keyframes spin {
-            to { transform: rotate(360deg); }
+            100% {
+                transform: rotate(360deg);
+            }
         }
 
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(4px); }
-            to { opacity: 1; transform: translateY(0); }
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
-        @media (max-width: 700px) {
-            .card {
-                padding: 20px;
+        @media (max-width: 600px) {
+            .glass-card {
+                padding: 25px;
+                border-radius: 20px;
             }
 
-            .form-grid {
-                grid-template-columns: 1fr;
+            .header h1 {
+                font-size: 1.8rem;
             }
 
-            .field.full {
-                grid-column: auto;
-            }
-
-            .action-row {
-                justify-content: stretch;
-            }
-
-            button {
+            .submit-btn {
                 width: 100%;
             }
         }
     </style>
 </head>
+
 <body>
-    <main class="card">
-        <h1 class="title">Smart Expense Management &amp; Budget Recommendation System</h1>
-        <p class="subtitle">Enter your monthly spending profile to get ML-driven budget recommendations and savings insights.</p>
+    <main class="glass-card">
+        <header class="header">
+            <h1><i class="fa-solid fa-chart-pie"></i> Smart Budget AI</h1>
+            <p>Optimize your monthly spending with machine learning insights.</p>
+        </header>
 
         <form id="budgetForm" novalidate>
-            <div class="form-grid">
-                <div class="field">
-                    <label for="groceries">Groceries</label>
-                    <input id="groceries" type="number" min="0" step="0.01" placeholder="e.g. 250.00" required>
+            <div class="sections-wrapper">
+
+                <!-- Income & Goals Section -->
+                <div class="section">
+                    <h2 class="section-title"><i class="fa-solid fa-wallet"></i> Income & Goals</h2>
+                    <div class="form-grid">
+                        <div class="input-group">
+                            <label for="disposableIncome">Disposable Income (₹)</label>
+                            <div class="input-wrapper">
+                                <i class="fa-solid fa-money-bill-wave"></i>
+                                <input id="disposableIncome" type="number" min="0" step="0.01" placeholder="e.g. 50000"
+                                    required>
+                            </div>
+                        </div>
+                        <div class="input-group">
+                            <label for="desiredSavings">Desired Savings (₹)</label>
+                            <div class="input-wrapper">
+                                <i class="fa-solid fa-piggy-bank"></i>
+                                <input id="desiredSavings" type="number" min="0" step="0.01" placeholder="e.g. 15000"
+                                    required>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
-                <div class="field">
-                    <label for="transport">Transport</label>
-                    <input id="transport" type="number" min="0" step="0.01" placeholder="e.g. 120.00" required>
+                <hr style="border: 0; height: 1px; background: rgba(0,0,0,0.05); margin: 5px 0;">
+
+                <!-- Expenses Section -->
+                <div class="section">
+                    <h2 class="section-title"><i class="fa-solid fa-receipt"></i> Monthly Expenses</h2>
+                    <div class="form-grid">
+                        <div class="input-group">
+                            <label for="groceries">Groceries</label>
+                            <div class="input-wrapper">
+                                <i class="fa-solid fa-basket-shopping"></i>
+                                <input id="groceries" type="number" min="0" step="0.01" placeholder="e.g. 8000"
+                                    required>
+                            </div>
+                        </div>
+
+                        <div class="input-group">
+                            <label for="transport">Transport</label>
+                            <div class="input-wrapper">
+                                <i class="fa-solid fa-car-side"></i>
+                                <input id="transport" type="number" min="0" step="0.01" placeholder="e.g. 3000"
+                                    required>
+                            </div>
+                        </div>
+
+                        <div class="input-group">
+                            <label for="eatingOut">Eating Out</label>
+                            <div class="input-wrapper">
+                                <i class="fa-solid fa-utensils"></i>
+                                <input id="eatingOut" type="number" min="0" step="0.01" placeholder="e.g. 4000"
+                                    required>
+                            </div>
+                        </div>
+
+                        <div class="input-group">
+                            <label for="entertainment">Entertainment</label>
+                            <div class="input-wrapper">
+                                <i class="fa-solid fa-film"></i>
+                                <input id="entertainment" type="number" min="0" step="0.01" placeholder="e.g. 2500"
+                                    required>
+                            </div>
+                        </div>
+
+                        <div class="input-group">
+                            <label for="miscellaneous">Miscellaneous</label>
+                            <div class="input-wrapper">
+                                <i class="fa-solid fa-tags"></i>
+                                <input id="miscellaneous" type="number" min="0" step="0.01" placeholder="e.g. 2000"
+                                    required>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
-                <div class="field">
-                    <label for="eatingOut">Eating Out</label>
-                    <input id="eatingOut" type="number" min="0" step="0.01" placeholder="e.g. 90.00" required>
-                </div>
-
-                <div class="field">
-                    <label for="entertainment">Entertainment</label>
-                    <input id="entertainment" type="number" min="0" step="0.01" placeholder="e.g. 80.00" required>
-                </div>
-
-                <div class="field">
-                    <label for="miscellaneous">Miscellaneous</label>
-                    <input id="miscellaneous" type="number" min="0" step="0.01" placeholder="e.g. 60.00" required>
-                </div>
-
-                <div class="field">
-                    <label for="desiredSavings">Desired Savings</label>
-                    <input id="desiredSavings" type="number" min="0" step="0.01" placeholder="e.g. 300.00" required>
-                </div>
-
-                <div class="field full">
-                    <label for="disposableIncome">Disposable Income</label>
-                    <input id="disposableIncome" type="number" min="0" step="0.01" placeholder="e.g. 1800.00" required>
-                </div>
             </div>
 
             <div class="action-row">
-                <button id="submitBtn" type="submit">
-                    <span id="btnText">Get Recommendation</span>
-                    <span id="loader" class="loader" aria-hidden="true"></span>
+                <button id="submitBtn" type="submit" class="submit-btn">
+                    <span id="btnText">Analyze Budget Workspace</span>
+                    <i id="btnIcon" class="fa-solid fa-wand-magic-sparkles"></i>
+                    <span id="loader" class="loader"></span>
                 </button>
             </div>
         </form>
 
-        <section id="result" class="result" aria-live="polite"></section>
+        <section id="resultContainer" class="result-container">
+            <div id="resultCard" class="result-card">
+                <!-- Content injected via JS -->
+            </div>
+        </section>
     </main>
 
     <script>
         const form = document.getElementById("budgetForm");
         const submitBtn = document.getElementById("submitBtn");
         const btnText = document.getElementById("btnText");
+        const btnIcon = document.getElementById("btnIcon");
         const loader = document.getElementById("loader");
-        const result = document.getElementById("result");
+        const resultContainer = document.getElementById("resultContainer");
+        const resultCard = document.getElementById("resultCard");
 
         function getNumber(id) {
             return Number.parseFloat(document.getElementById(id).value);
@@ -293,43 +470,65 @@
 
         function setLoading(isLoading) {
             submitBtn.disabled = isLoading;
-            btnText.textContent = isLoading ? "Processing..." : "Get Recommendation";
+            btnText.textContent = isLoading ? "Processing..." : "Analyze Budget Workspace";
             loader.style.display = isLoading ? "inline-block" : "none";
+            btnIcon.style.display = isLoading ? "none" : "inline-block";
         }
 
         function showError(message) {
-            result.className = "result error";
-            result.innerHTML = "<h3>Error</h3><p>" + message + "</p>";
-            result.style.display = "block";
+            resultCard.className = "result-card error";
+            resultCard.innerHTML = `
+                <div class="result-header">
+                    <i class="fa-solid fa-circle-exclamation"></i>
+                    <h3>Analysis Failed</h3>
+                </div>
+                <p class="result-message">${message}</p>
+            `;
+            resultContainer.style.display = "block";
         }
 
         function showSuccess(data) {
             const message = data.message || data.Message || "Budget recommendation generated successfully.";
-            const savings = data.savings ?? data.Savings;
+            const savings = data.savings ?? data.Savings ?? data.Saving;
             const suggestions = data.suggestions || data.Suggestions || [];
 
-            let html = "<h3>Message</h3><p>" + message + "</p>";
+            let html = `
+                <div class="result-header">
+                    <i class="fa-solid fa-circle-check"></i>
+                    <h3>Recommendation Ready</h3>
+                </div>
+                <p class="result-message">${message}</p>
+            `;
 
             if (savings !== undefined && savings !== null && !Number.isNaN(Number(savings))) {
-                html += '<div class="savings">Savings: ' + Number(savings).toFixed(2) + "</div>";
+                html += `<div class="savings-badge"><i class="fa-solid fa-arrow-trend-up"></i> Projected Savings: ₹${Number(savings).toFixed(2)}</div>`;
             }
 
             if (Array.isArray(suggestions) && suggestions.length > 0) {
-                html += "<h3>Suggestions</h3><ul>";
+                html += `<h4 style="margin-top: 10px; color: var(--text-main);">Actionable Insights:</h4>`;
+                html += `<ul class="suggestions-list">`;
                 for (const suggestion of suggestions) {
-                    html += "<li>" + suggestion + "</li>";
+                    html += `<li>${suggestion}</li>`;
                 }
-                html += "</ul>";
+                html += `</ul>`;
             }
 
-            result.className = "result success";
-            result.innerHTML = html;
-            result.style.display = "block";
+            resultCard.className = "result-card success";
+            resultCard.innerHTML = html;
+            resultContainer.style.display = "block";
+
+            // Scroll to results slightly
+            resultContainer.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
         }
 
         form.addEventListener("submit", async (event) => {
             event.preventDefault();
-            result.style.display = "none";
+            resultContainer.style.display = "none";
+
+            // Reattach animation
+            resultContainer.style.animation = 'none';
+            resultContainer.offsetHeight; // trigger reflow
+            resultContainer.style.animation = null;
 
             const payload = {
                 "Groceries": getNumber("groceries"),
@@ -350,7 +549,8 @@
 
             setLoading(true);
             try {
-                const response = await fetch("http://127.0.0.1:8000/recommend-budget", {
+                // Using relative path for integrated Flask server
+                const response = await fetch("/recommend-budget", {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json"
@@ -365,12 +565,26 @@
 
                 showSuccess(data);
             } catch (error) {
-                const fallback = "Could not connect to the API. Make sure Flask is running at http://127.0.0.1:8000 and CORS is enabled.";
+                const fallback = "Could not connect to the API. Make sure Flask is running and CORS is enabled (if using separate frontend).";
                 showError(error.message === "Failed to fetch" ? fallback : error.message);
             } finally {
                 setLoading(false);
             }
         });
+
+        // Add nice interactive effects
+        document.querySelectorAll('input').forEach(input => {
+            // Focus effects are handled in CSS, but we ensure icons pop correctly
+            input.addEventListener('focus', function () {
+                this.previousElementSibling.style.color = "var(--primary)";
+            });
+            input.addEventListener('blur', function () {
+                if (!this.value) {
+                    this.previousElementSibling.style.color = "var(--text-muted)";
+                }
+            });
+        });
     </script>
 </body>
+
 </html>
