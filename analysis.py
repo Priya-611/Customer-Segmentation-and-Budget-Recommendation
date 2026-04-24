@@ -129,10 +129,6 @@ def recommend_budget(user_data,kmn,sc,cluster_profile):
 # print(recommend_budget(user_data,kmn,sc,cluster_profile))
 
 
-
-
-
-
 import pickle
 with open(r'C:\Users\HP\OneDrive\Documents\Etc\Project(Data Science)\Predictor\Budget Analysis\expenses_model.pkl','wb') as f:
     pickle.dump({'kmn':kmn,'sc':sc,'cluster_profile':cluster_profile},f)
