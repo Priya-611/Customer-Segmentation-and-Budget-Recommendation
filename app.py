@@ -1,10 +1,10 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, render_template
 import pandas as pd
 import pickle
 
-app = Flask(__name__)
+app = Flask(__name__, template_folder='.')
 
-with open('expenses_model.pkl', 'rb') as f:
+with open(r'C:\Users\HP\OneDrive\Documents\Etc\Project(Data Science)\Predictor\Budget Analysis\expenses_model.pkl', 'rb') as f:
     model = pickle.load(f)
 
 expenses_kmn = model['kmn']
@@ -36,19 +36,25 @@ def recommend_budget(user_data, kmn, sc, cluster_profile):
         cluster_id = kmn.predict(scaled_x)[0]
         cluster_pro = cluster_profile.loc[cluster_id]
 
-        user_saving = (
-            user_data_mapped['Disposable_Income'].values[0] -
-            user_data_mapped['Desired_Savings'].values[0]
+        total_expenses = (
+            user_data_mapped['Groceries'].values[0] +
+            user_data_mapped['Transport'].values[0] +
+            user_data_mapped['Eating_Out'].values[0] +
+            user_data_mapped['Entertainment'].values[0] +
+            user_data_mapped['Miscellaneous'].values[0]
         )
 
-        if user_saving >= 0:
+        actual_saving = user_data_mapped['Disposable_Income'].values[0] - total_expenses
+        desired_saving = user_data_mapped['Desired_Savings'].values[0]
+
+        if actual_saving >= desired_saving:
             return {
-                "Message": f"Your saving goal is achievable. You are saving ₹{user_saving:.2f} monthly.",
-                "Saving": user_saving,
+                "Message": f"Your saving goal is achievable. You are saving ₹{actual_saving:.2f} monthly.",
+                "Saving": actual_saving,
                 "Suggestions": []
             }
         
-        shortfall = abs(user_saving)
+        shortfall = desired_saving - actual_saving
         suggestions = []
 
         for col in ['Groceries','Transport','Eating_Out','Entertainment','Miscellaneous']:
@@ -68,6 +74,11 @@ def recommend_budget(user_data, kmn, sc, cluster_profile):
     except Exception as e:
         return {"error": str(e)}
 
+
+# Frontend Route
+@app.route("/")
+def home():
+    return render_template("index.html")
 
 # Flask API (clean + complete)
 @app.route("/recommend-budget", methods=["POST"])
