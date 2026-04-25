@@ -32,6 +32,7 @@ This project uses **K-Means Clustering** to group spending patterns and suggest 
 ## 📂 Project Structure
 
 ```
+├── data.csv               # datset
 ├── app.py                 # Flask backend API
 ├── analysis.py            # Model training script
 ├── expenses_model.pkl     # Trained ML model
